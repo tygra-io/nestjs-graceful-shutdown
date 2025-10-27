@@ -3,7 +3,7 @@ import type {
   INestApplication,
   OnApplicationShutdown,
 } from '@nestjs/common';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { HttpTerminator } from '@tygra/http-terminator';
 import { createHttpTerminator } from '@tygra/http-terminator';
 
@@ -21,6 +21,8 @@ const SetupFunctionNotInvoked = new Error(
 export class GracefulShutdownService
   implements BeforeApplicationShutdown, OnApplicationShutdown
 {
+  private readonly logger = new Logger(GracefulShutdownService.name);
+
   private httpTerminator: HttpTerminator | null = null;
   private app: INestApplication | null = null;
 
@@ -68,9 +70,11 @@ export class GracefulShutdownService
 
   setupGracefulShutdown(app: INestApplication): void {
     this.app = app;
+
     this.httpTerminator = createHttpTerminator({
       gracefulTerminationTimeout: this.options.gracefulShutdownTimeout,
       server: app.getHttpServer(),
+      logger: this.logger,
     });
   }
 }
