@@ -200,6 +200,7 @@ export const createTests = (
         keepNodeProcessAlive: true,
       }),
     });
+
     const { app, shutdownServer, url, cleanupNestJSApp } = testingServer;
 
     setupGracefulShutdown({ app });
