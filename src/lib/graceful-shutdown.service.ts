@@ -4,8 +4,8 @@ import type {
   OnApplicationShutdown,
 } from '@nestjs/common';
 import { Inject, Injectable } from '@nestjs/common';
-import type { HttpTerminator } from 'http-terminator';
-import { createHttpTerminator } from 'http-terminator';
+import type { HttpTerminator } from '@tygra/http-terminator';
+import { createHttpTerminator } from '@tygra/http-terminator';
 
 import {
   DEFAULT_CONFIG_OPTIONS,
