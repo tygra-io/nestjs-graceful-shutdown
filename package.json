@@ -1,16 +1,27 @@
 {
-  "name": "nestjs-graceful-shutdown",
-  "version": "1.0.3",
+  "name": "@tygra/nestjs-graceful-shutdown",
+  "version": "1.0.0",
   "description": "A powerful package for gracefully shutting down NestJS applications",
   "main": "build/main/index.js",
   "types": "build/main/index.d.ts",
   "license": "MIT",
-  "author": "hienngm <hienngm99@gmail.com>",
+  "author": {
+    "email": "hi@tygra.io",
+    "name": "Tygra",
+    "url": "https://tygra.io"
+  },
+  "contributors": [
+    {
+      "email": "hienngm99@gmail.com",
+      "name": "hienngm",
+      "url": "https://github.com/hienngm"
+    }
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/hienngm/nestjs-graceful-shutdown"
+    "url": "https://github.com/tygra-io/nestjs-graceful-shutdown"
   },
-  "homepage": "https://github.com/hienngm/nestjs-graceful-shutdown#readme",
+  "homepage": "https://github.com/tygra-io/nestjs-graceful-shutdown#readme",
   "scripts": {
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig.build.json",
