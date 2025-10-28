@@ -6,15 +6,16 @@
 <p align="center">
   Elevate your NestJS application with seamless and reliable server shutdowns, guaranteeing uninterrupted user experiences and effortless handling of critical shutdown scenarios.
   <p align="center">
-    <a href="https://www.npmjs.com/package/nestjs-graceful-shutdown" target="_blank"><img alt="npm version" src="https://img.shields.io/npm/v/nestjs-graceful-shutdown" /></a>
-    <a href="https://www.npmjs.com/package/nestjs-graceful-shutdown" target="_blank"><img alt="NPM" src="https://img.shields.io/npm/l/nestjs-graceful-shutdown" /></a>
-    <a href="https://www.npmjs.com/package/nestjs-graceful-shutdown" target="_blank"><img alt="npm downloads" src="https://img.shields.io/npm/dm/nestjs-graceful-shutdown" /></a>
-     <a href="https://coveralls.io/github/hienngm/nestjs-graceful-shutdown?branch=main" target="_blank"><img alt="coverage" src="https://coveralls.io/repos/github/hienngm/nestjs-graceful-shutdown/badge.svg?branch=main" /></a>
+    <a href="https://www.npmjs.com/package/@tygra/nestjs-graceful-shutdown" target="_blank"><img alt="npm version" src="https://img.shields.io/npm/v/@tygra/nestjs-graceful-shutdown" /></a>
+    <a href="https://www.npmjs.com/package/@tygra/nestjs-graceful-shutdown" target="_blank"><img alt="NPM" src="https://img.shields.io/npm/l/@tygra/nestjs-graceful-shutdown" /></a>
+    <a href="https://www.npmjs.com/package/@tygra/nestjs-graceful-shutdown" target="_blank"><img alt="npm downloads" src="https://img.shields.io/npm/dm/@tygra/nestjs-graceful-shutdown" /></a>
+     <a href="https://coveralls.io/github/tygra-io/nestjs-graceful-shutdown?branch=main" target="_blank"><img alt="coverage" src="https://coveralls.io/repos/github/tygra-io/nestjs-graceful-shutdown/badge.svg?branch=main" /></a>
   </p>
 </p>
 
 ## Table of Contents
 
+- [What's New](#whats-new)
 - [Description](#description)
 - [Installation](#installation)
 - [Example](#example)
@@ -23,30 +24,41 @@
 - [Contact and Feedback](#contact-and-feedback)
 - [License](#license)
 
+## What's New
+
+### Enhanced Reliability & Test Coverage
+
+- **Comprehensive test coverage**: Achieved >99% statement coverage and >87% branch coverage with 44+ test cases
+- **Robust error handling**: Improved fallback mechanisms and graceful degradation when termination fails
+- **Edge case coverage**: Extensive testing of error scenarios including cleanup failures, termination errors, and signal handling
+- **Production-ready**: Ensures your application never hangs, with intelligent fallback to direct server close
+
 ## Description
 
 Don't let your server hang indefinitely!
 
 When you explicitly call `app.close()` or if the process receive a special system signal (such as SIGTERM) after correctly invoking `enableShutdownHooks` during application bootstrap (check out the <a href="https://docs.nestjs.com/fundamentals/lifecycle-events#application-shutdown" target="_blank">NestJS docs</a>), the server stops accepting new connections while maintaining existing ones. This leads to your server hanging indefinitely due to lingering keep-alive connections or unresponsive requests.
 
-Powered by the robust <a href="https://www.npmjs.com/package/http-terminator" target="_blank">`http-terminator`</a>library and backed by NestJS's built-in shutdown hooks, `nestjs-graceful-shutdown` ensures graceful communication with clients currently receiving responses from your server during the shutdown process. Experience a reliable and hassle-free server shutdown with ease.
+Powered by the robust <a href="https://www.npmjs.com/package/@tygra/http-terminator" target="_blank">`@tygra/http-terminator`</a> library and backed by NestJS's built-in shutdown hooks, `@tygra/nestjs-graceful-shutdown` ensures graceful communication with clients currently receiving responses from your server during the shutdown process. Experience a reliable and hassle-free server shutdown with ease.
 
 ## Installation
 
 You can install the library using npm:
 
 ```
-npm install nestjs-graceful-shutdown http-terminator
+npm install @tygra/nestjs-graceful-shutdown
 ```
+
+> **Note:** `@tygra/http-terminator` is automatically installed as a dependency when you install `@tygra/nestjs-graceful-shutdown`.
 
 ## Example
 
-To integrate `nestjs-graceful-shutdown` into your NestJS application, follow these steps:
+To integrate `@tygra/nestjs-graceful-shutdown` into your NestJS application, follow these steps:
 
 1. First, import the module with `GracefulShutdownModule.forRoot(...)` or `GracefulShutdownModule.forRootAsync(...)` into your root `AppModule`. (refer to the module configuration documentation [below](#configuration)).
 
 ```ts
-import { GracefulShutdownModule } from 'nestjs-graceful-shutdown';
+import { GracefulShutdownModule } from '@tygra/nestjs-graceful-shutdown';
 
 @Module({
   imports: [GracefulShutdownModule.forRoot()],
@@ -57,10 +69,10 @@ class AppModule {}
 
 2. Next, set up graceful shutdown for your NestJS application by calling the `setupGracefulShutdown(...)` function.
 
-> ⚠️ **Warning:** `nestjs-graceful-shutdown` will automatically enable the shutdown hooks. Avoid calling `enableShutdownHooks` separately in your application, as it may lead to unexpected behavior. For more information on NestJS application lifecycle, refer to the <a href ="https://docs.nestjs.com/fundamentals/lifecycle-events#application-shutdown" target="_blank">NestJS documentation</a>.
+> ⚠️ **Warning:** `@tygra/nestjs-graceful-shutdown` will automatically enable the shutdown hooks. Avoid calling `enableShutdownHooks` separately in your application, as it may lead to unexpected behavior. For more information on NestJS application lifecycle, refer to the <a href ="https://docs.nestjs.com/fundamentals/lifecycle-events#application-shutdown" target="_blank">NestJS documentation</a>.
 
 ```typescript
-import { setupGracefulShutdown } from 'nestjs-graceful-shutdown';
+import { setupGracefulShutdown } from '@tygra/nestjs-graceful-shutdown';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
@@ -81,7 +93,7 @@ async function bootstrap() {
 bootstrap();
 ```
 
-Please note that the above code snippets demonstrate the basic setup of `nestjs-graceful-shutdown` in your NestJS application. Make sure to adjust the code based on your specific application requirements and configuration.
+Please note that the above code snippets demonstrate the basic setup of `@tygra/nestjs-graceful-shutdown` in your NestJS application. Make sure to adjust the code based on your specific application requirements and configuration.
 
 ## Configuration
 
@@ -102,13 +114,6 @@ interface IGracefulShutdownConfigOptions {
    * Defaults: 5000 (5 seconds).
    */
   gracefulShutdownTimeout?: number;
-  /**
-   * If set to `true`, the Node process will not be terminated
-   * by a shutdown signal after closing all connections.
-   * The shutdown behavior is identical to invoking `app.close()`.
-   * Defaults: false.
-   */
-  keepNodeProcessAlive?: boolean;
 }
 ```
 
@@ -133,7 +138,7 @@ interface ISetupFunctionParams {
 Just import `GracefulShutdownModule` to `AppModule`:
 
 ```ts
-import { GracefulShutdownModule } from 'nestjs-graceful-shutdown';
+import { GracefulShutdownModule } from '@tygra/nestjs-graceful-shutdown';
 
 @Module({
   imports: [GracefulShutdownModule.forRoot()],
@@ -147,7 +152,7 @@ class AppModule {}
 Use `GracefulShutdownModule.forRoot` method with argument of [Configuration interface](#configuration-interface):
 
 ```ts
-import { GracefulShutdownModule } from 'nestjs-graceful-shutdown';
+import { GracefulShutdownModule } from '@tygra/nestjs-graceful-shutdown';
 
 @Module({
   imports: [
@@ -157,7 +162,6 @@ import { GracefulShutdownModule } from 'nestjs-graceful-shutdown';
       },
       gracefulShutdownTimeout:
         Number(process.env.GRACEFUL_SHUTDOWN_TIMEOUT ?? 10000),
-      keepNodeProcessAlive: true,
     })
   ],
   ...
@@ -174,7 +178,7 @@ With `GracefulShutdownModule.forRootAsync` you can, for example, import your `Co
 Here's an example:
 
 ```ts
-import { GracefulShutdownModule } from 'nestjs-graceful-shutdown';
+import { GracefulShutdownModule } from '@tygra/nestjs-graceful-shutdown';
 
 @Injectable()
 class ConfigService {
@@ -238,7 +242,7 @@ Feel free to reach out if you have any ideas, comments, or questions.
 
 Best regards,
 
-Hien Nguyen Minh
+Hien
 
 ## License
 
