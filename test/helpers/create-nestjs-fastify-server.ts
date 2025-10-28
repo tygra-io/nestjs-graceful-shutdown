@@ -43,8 +43,8 @@ export const createNestJSFastifyServer: NestJSTestingServerFactory = async (
     httpServer,
     url,
     app,
-    shutdownServer: () => {
-      process.kill(process.pid, 'SIGTERM');
+    shutdownServer: (signal?: string) => {
+      process.kill(process.pid, signal || 'SIGTERM');
     },
     cleanupNestJSApp: async () => {
       await app.close();

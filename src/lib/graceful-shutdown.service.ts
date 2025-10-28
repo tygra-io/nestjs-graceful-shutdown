@@ -35,9 +35,6 @@ export class GracefulShutdownService
       gracefulShutdownTimeout:
         options.gracefulShutdownTimeout ??
         DEFAULT_CONFIG_OPTIONS.gracefulShutdownTimeout,
-      keepNodeProcessAlive:
-        options.keepNodeProcessAlive ??
-        DEFAULT_CONFIG_OPTIONS.keepNodeProcessAlive,
     };
   }
 
@@ -46,7 +43,31 @@ export class GracefulShutdownService
       throw SetupFunctionNotInvoked;
     }
 
-    await this.httpTerminator.terminate();
+    try {
+      await this.httpTerminator.terminate();
+    } catch (error) {
+      this.logger.error('Failed to terminate HTTP server gracefully', error);
+
+      // Fallback: attempt direct server close
+      try {
+        if (this.app) {
+          const httpServer = this.app.getHttpServer();
+          if (httpServer && httpServer.listening) {
+            await new Promise<void>((resolve, reject) => {
+              httpServer.close((err) => {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve();
+                }
+              });
+            });
+          }
+        }
+      } catch (fallbackError) {
+        this.logger.warn('Fallback server close also failed', fallbackError);
+      }
+    }
   }
 
   async onApplicationShutdown(signal?: string): Promise<void> {
@@ -54,9 +75,23 @@ export class GracefulShutdownService
       throw SetupFunctionNotInvoked;
     }
 
-    await this.options.cleanup?.(this.app, signal);
-    if (signal && this.options.keepNodeProcessAlive) {
-      this.skipShutdownSignal(signal);
+    if (this.options.cleanup) {
+      try {
+        await this.options.cleanup(this.app, signal);
+      } catch (error) {
+        this.logger.error(
+          `Cleanup function failed${signal ? ` (signal: ${signal})` : ''}`,
+          error
+        );
+      }
+    }
+
+    if (signal) {
+      try {
+        this.skipShutdownSignal(signal);
+      } catch (error) {
+        this.logger.warn(`Failed to handle shutdown signal: ${signal}`, error);
+      }
     }
   }
 
